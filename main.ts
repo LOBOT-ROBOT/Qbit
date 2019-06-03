@@ -89,7 +89,20 @@
         TURN_RIGHT_SLOW,
         //% block="Invalid command"
         COMMAND_ERRO
-    }
+     }
+     
+     export enum OrientionType {
+        //% block="Stop"
+        STOP = 0,
+        //% block="Go ahead"
+        GO_AHEAD = 1,
+        //% block="Back"
+        GO_BACK = 2,
+        //% block="Turn left"
+        TURN_LEFT = 3,
+        //% block="Turn right"
+        TURN_RIGHT = 4
+     }
 
 
     let lhRGBLight: QbitRGBLight.LHQbitRGBLight;
@@ -291,11 +304,28 @@
    serial.writeBuffer(buf);
 }
     
-    
+/**
+*	Set the speed of the motor, range of -100~100, that can control the Qbit running.
+*/
+//% weight=98 blockId=setQbitRunSpeed block="Set Qbit(V1.2 version or newer) run|speed %speed|and oriention %oriention"
+//% speed.min=-100 speed.max=100
+export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
+    if (speed> 100 || speed < 0) {
+        return;
+    }
+    let buf = pins.createBuffer(6);
+    buf[0] = 0x55;
+    buf[1] = 0x55;
+    buf[2] = 0x04;
+    buf[3] = 0x32;//cmd type
+    buf[4] = speed;
+    buf[5] = oriention;
+    serial.writeBuffer(buf);
+}    
 /**
 * Set the center balance angle of the Qbit
 */
-//% weight=98 blockId=setBLAngle block="Set the center balance angle of the Qbit"
+//% weight=96 blockId=setBLAngle block="Set the center balance angle of the Qbit"
     export function setBLAngle() {
    let buf = pins.createBuffer(5);
    buf[0] = 0x55;
@@ -309,7 +339,7 @@
 /**
 *  Obtain the distance of ultrasonic detection to the obstacle
 */
-//% weight=97 blockId=Ultrasonic block="Ultrasonic distance(cm)"
+//% weight=94 blockId=Ultrasonic block="Ultrasonic distance(cm)"
    export function Ultrasonic(): number {
 	   //init pins
    let echoPin:DigitalPin = DigitalPin.P13;
@@ -328,13 +358,13 @@
    let d = pins.pulseIn(echoPin, PulseValue.High, 11600);
     basic.pause(10);
     return d / 40;
-    }
+}
     
     
 /**
 *  Send ultrasonic distance to control board
 */
-//% weight=96 blockId=UltrasonicSend block="Send ultrasonic distance to control board"
+//% weight=92 blockId=UltrasonicSend block="Send ultrasonic distance to control board"
     export function UltrasonicSend() {
     let distance = Ultrasonic();
     let buf = pins.createBuffer(6);
@@ -350,7 +380,7 @@
       /**
     * Stop Qbit run.
     */
-    //% weight=95 blockId=setQbitRun block="Set Qbit %runType"
+    //% weight=90 blockId=setQbitRun block="Set Qbit %runType"
     export function setQbitRun(runType: QbitRunType) {
         let buf = pins.createBuffer(5);
         buf[0] = 0x55;
@@ -364,7 +394,7 @@
 /**
 * Get the volume level detected by the sound sensor, range 0 to 255
 */
-//% weight=94 blockId=getSoundVolume block="Sound volume"
+//% weight=88 blockId=getSoundVolume block="Sound volume"
 	export function getSoundVolume(): number {	
         let volume = pins.analogReadPin(AnalogPin.P1);
         volume = mapRGB(volume, 0, 1023, 0, 255);
@@ -374,7 +404,7 @@
     /**
      * Detect whether avoid obstacle sensor detect obstacle
      */
-    //% weight=93 blockGap=50  blockId=obstacleSensor block="avoid obstacle|%sensor|detect obstacle"
+    //% weight=86 blockGap=50  blockId=obstacleSensor block="avoid obstacle|%sensor|detect obstacle"
     export function obstacleSensor(sensor: ObstacleSensor): boolean {
         if (sensor == ObstacleSensor.SENSOR1_OBSTACLE)
         {
@@ -402,7 +432,7 @@
          * @param brightness a measure of LED brightness in 0-255. eg: 255
     */
     //% blockId="setBrightness" block="set brightness %brightness"
-    //% weight=92
+    //% weight=84
     export function setBrightness(brightness: number): void {
         lhRGBLight.setBrightness(brightness);
     }
@@ -410,7 +440,7 @@
     /**
      * Set the color of the colored lights, after finished the setting please perform  the display of colored lights.
      */
-    //% weight=91 blockId=setPixelRGB block="Set|%lightoffset|color to %rgb"
+    //% weight=82 blockId=setPixelRGB block="Set|%lightoffset|color to %rgb"
     export function setPixelRGB(lightoffset: Lights, rgb: QbitRGBColors)
     { 
         lhRGBLight.setPixelColor(lightoffset, rgb, versionFlag);
@@ -420,7 +450,7 @@
     /**
      * Set RGB Color argument
      */
-    //% weight=90 blockId=setPixelRGBArgs block="Set|%lightoffset|color to %rgb"
+    //% weight=80 blockId=setPixelRGBArgs block="Set|%lightoffset|color to %rgb"
     export function setPixelRGBArgs(lightoffset: Lights, rgb: number)
     {
         lhRGBLight.setPixelColor(lightoffset, rgb, versionFlag);
@@ -430,7 +460,7 @@
     /**
      * Display the colored lights, and set the color of the colored lights to match the use. After setting the color of the colored lights, the color of the lights must be displayed.
      */
-    //% weight=88 blockId=showLight block="Show light"
+    //% weight=78 blockId=showLight block="Show light"
     export function showLight() {
         lhRGBLight.show();
     }
@@ -438,7 +468,7 @@
     /**
      * Clear the color of the colored lights and turn off the lights.
      */
-    //% weight=86 blockGap=50 blockId=clearLight block="Clear light"
+    //% weight=76 blockGap=50 blockId=clearLight block="Clear light"
     export function clearLight() {
         lhRGBLight.clear();
     }
@@ -715,7 +745,7 @@
 	/**
 	 *  Color sensor to obtain color value.
 	 */
-	//% weight=84 blockId=checkCurrentColor block="Current color %color"
+	//% weight=74 blockId=checkCurrentColor block="Current color %color"
      export function checkCurrentColor(color: Colors): boolean {
 	setBrightness(150);     
         setPixelRGB(Lights.Light1, QbitRGBColors.White);
@@ -784,7 +814,7 @@
     /**
 	 *  Color sensor light level, range from 0 ~ 255
 	 */
-	//% weight=83 blockGap=50 blockId=getSensorLightLevel block="Get color sensor light level"
+	//% weight=72 blockGap=50 blockId=getSensorLightLevel block="Get color sensor light level"
      export function getSensorLightLevel(): number {
          let lightLevel: number = readAmbientLight();
          serial.writeNumber(lightLevel); 
@@ -795,7 +825,7 @@
     /**
 	 * Extension pin set
 	 */
-    //% weight=82 blockId=setExtsIO block="Set extension pin|%ext|%iostatus"
+    //% weight=70 blockId=setExtsIO block="Set extension pin|%ext|%iostatus"
      export function setExtsIO(ext: Exts, iostatus: pinIOStatus)
      {
          if (ext == Exts.Ext1)
@@ -811,7 +841,7 @@
     /**
 	 * Extension pin read digital
 	 */
-    //% weight=80 blockId=readExtsIODigital block="Read extension pin|%ext|digital"
+    //% weight=68 blockId=readExtsIODigital block="Read extension pin|%ext|digital"
     export function readExtsIODigital(ext: Exts):boolean
     {
         let status = 0;
@@ -835,7 +865,7 @@
     /**
 	 * Extension  1 pin read analog
 	 */
-    //% weight=79 blockGap=50 blockId=readExt1Analog block="Read extension 1 pin analog"
+    //% weight=66 blockGap=50 blockId=readExt1Analog block="Read extension 1 pin analog"
     export function readExt1Analog():number
     {
         return pins.analogReadPin(AnalogPin.P2);
@@ -844,7 +874,7 @@
     /**
 	 * Get Qbit current voltage,the unit is mV
 	 */
-    //% weight=78 blockId=getBatVoltage block="Get Qbit current voltage (mV)"
+    //% weight=64 blockId=getBatVoltage block="Get Qbit current voltage (mV)"
     export function getBatVoltage(): number {
         return currentVoltage;
     }
@@ -852,7 +882,7 @@
      /**
      * Resolve the Bluetooth that phone APP send command type, the total of nine types of commands: tank display command, servo debug command, obtaining the distance of ultrasonic command, obtaining temperature command, obtain sound size rank orders, to obtain the light level command, set the color lights command, honking command, firmware version information command.
      */
-    //% weight=76 blockId=analyzeBluetoothCmd block="Get bluetooth command type %str"
+    //% weight=62 blockId=analyzeBluetoothCmd block="Get bluetooth command type %str"
     export function analyzeBluetoothCmd(str: string): number {
         if (str.length > 9)
         {
@@ -902,7 +932,7 @@
     /**
      * Resolve the parameters that the phone APP send the command,there are 3 parameters of servo debug command,the other command has just one parameter.
      */
-    //% weight=74  blockId=getArgs block="Get bluetooth command|%str|argument at %index"
+    //% weight=60  blockId=getArgs block="Get bluetooth command|%str|argument at %index"
     //% index.min=1 index.max=3
     export function getArgs(str: string, index: number): number {
         let cmdType = analyzeBluetoothCmd(str);
@@ -947,7 +977,7 @@
     /**
      * Returns the enumeration of the command type, which can be compared with this module after obtaining the bluetooth command type sent by the mobile phone APP.
      */
-    //% weight=72 blockId=getBluetoothCmdtype block="Bluetooth command type %type"
+    //% weight=58 blockId=getBluetoothCmdtype block="Bluetooth command type %type"
     export function getBluetoothCmdtype(type: CmdType): number {
         return type;
     }
@@ -955,7 +985,7 @@
     /**
      * The command type of the tank is stop, go ahead, back, turn left, turn right, slow down, turn left slowly, turn right slowly.
      */
-    //% weight=70 blockId=getRunCarType block="Car run type %type"
+    //% weight=56 blockId=getRunCarType block="Car run type %type"
     export function getRunCarType(type: CarRunCmdType): number {
         return type;
     }
@@ -963,7 +993,7 @@
     /**
      * The distance from the ultrasonic obstacle to the standard command, which is sent to the mobile phone. The APP will indicate the distance of the ultrasonic obstacle.
      */
-    //% weight=68 blockId=convertUltrasonic block="Convert ultrasonic distance %data"
+    //% weight=54 blockId=convertUltrasonic block="Convert ultrasonic distance %data"
     export function convertUltrasonic(data: number): string {
         let cmdStr: string = "CMD|03|";
         cmdStr += data.toString();
@@ -974,7 +1004,7 @@
     /**
      * The conversion temperature value to standard command, sent to the mobile phone, and the APP displays the current temperature.
      */
-    //% weight=66 blockId=convertTemperature block="Convert temperature %data"
+    //% weight=52 blockId=convertTemperature block="Convert temperature %data"
     export function convertTemperature(data: number): string {
         let cmdStr: string = "CMD|04|";
         cmdStr += data.toString();
@@ -985,7 +1015,7 @@
     /**
      * Convert the light value to the standard command and send it to the mobile phone. The APP displays the current light level (0~255).
      */
-    //% weight=64 blockId=convertLight block="Convert light %data"
+    //% weight=50 blockId=convertLight block="Convert light %data"
     export function convertLight(data: number): string {
         let cmdStr: string = "CMD|06|";
         cmdStr += data.toString();
@@ -996,7 +1026,7 @@
     /**
      * Convert the battery value to the standard command and send it to the mobile phone. The APP displays the current voltage.
      */
-    //% weight=62 blockId=convertBattery block="Convert battery %data"
+    //% weight=48 blockId=convertBattery block="Convert battery %data"
     export function convertBattery(data: number): string {
         let cmdStr: string = "CMD|07|";
         cmdStr += data.toString();
