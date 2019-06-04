@@ -2,7 +2,7 @@
 	"qbit.qbitInit|block": "初始化Qbit",
 	"qbit.setMotorSpeed|block": "设置电机1速度|%speed1|和电机2|速度 %speed2",
 	"qbit.Ultrasonic|block": "超声波检测到障碍物距离(厘米)",
-	"qbit.setQbitRunSpeed|block":"设置Qbit(V1.2或以上版本) 运行|速度 %speed|方向 %oriention",
+	"qbit.setQbitRunSpeed|block":"设置Qbit(V2.0或以上版本) 运行|速度 %speed|方向 %oriention",
 	"qbit.getSoundVolume|block": "音量大小",
 	"Lights.Light1|block":"彩灯1",
 	"Lights.Light2|block":"彩灯2",
@@ -79,5 +79,7 @@
 	"qbit.convertBattery|block":"转换电量命令 %data",
 	"qbit.getBatVoltage|block":"获取qbit当前电压值(mV)",
 	"qbit.UltrasonicSend|block":"发送超声波测试距离到控制板中",
-	"qbit.setBLAngle|block":"设置Qbit中心平衡角度"
+	"qbit.setBLAngle|block":"设置Qbit中心平衡角度",
+	"qbit.onQbit_remote_ir_pressed|block": "当红外遥控器|%code|按下时",
+	"qbit.onQbit_remote_no_ir|block": "当遥控器停止按下"
 }

@@ -104,14 +104,87 @@
         TURN_RIGHT = 4
      }
 
+     export enum IRKEY {
+        //% block="CH-"
+        CH_MINUS=162,
+        //% block="CH"
+        CH=98,
+        //% block="CH+"
+        CH_ADD=226,
+        //% block="PREV"
+        PREV=34,
+        //% block="NEXT"
+        NEXT=2,
+        //% block="PLAY/PAUSE"
+        PLAY_PAUSE=194,
+        //% block="+"
+        ADD=168,
+        //% block="-"
+        MINUS=224,
+        //% block="EQ"
+        EQ=144,
+        //% block="100+"
+        _100=152,
+        //% block="200+"
+         _200 = 176,
+        //% block="A"
+        A=0x0C,
+        //% block="B"
+        B=0x8C,
+        //% block="C"
+        C = 0x4C,
+        //% block="D"
+        D = 0xCC,     
+        //% block="E"
+        E = 0xAC,   
+        //% block="F"
+        F = 0x5C,   
+        //% block="UP"
+        UP = 0X2C,
+        //% block="DOWN"
+        DOWN = 0X9C,  
+        //% block="LEFT"
+        LEFT = 0X6C,
+        //% block="RIGHT"
+        RIGHT = 0X1C, 
+        //% block="SET"
+        SET = 0XEC, 
+        //% block="R0"
+         R0 = 104,
+        //% block="R1"
+        R1=48,
+        //% block="R2"
+        R2=24,
+        //% block="R3"
+        R3=122,
+        //% block="R4"
+        R4=16,
+        //% block="R5"
+        R5=56,
+        //% block="R6"
+        R6=90,
+        //% block="R7"
+        R7=66,
+        //% block="R8"     
+        R8=74,
+        //% block="R9"
+        R9=82
+    }
+
 
     let lhRGBLight: QbitRGBLight.LHQbitRGBLight;
     let obstacleSensor1: boolean = false;
     let obstacleSensor2: boolean = false;
     let currentVoltage: number = 0;
-    let serialStop: boolean = false;
     let versionFlag: boolean = false; 
     let readTimes = 0;
+     
+     let MESSAGE_HEAD: number = 0xff;
+
+     let MESSAGE_HEAD_STOP: number = 0x101;
+
+     let adress = 0;
+     let sendFlag = false;
 	/**
    * Qbit initialization, please execute at boot time
   */
@@ -127,7 +200,7 @@
         basic.forever(() => {
             getHandleCmd();
         });
-	basic.pause(1200);
+	    basic.pause(1200);
         while(readTimes < 10 && !versionFlag)
         {
             readTimes++;
@@ -159,10 +232,11 @@
         let index = findIndexof(handleCmd, "$", 0);
         if (index != -1) {
             let cmd: string = handleCmd.substr(0, index);
-            if (cmd.charAt(0).compare("C") == 0 && cmd.length == 3)
+            if (cmd.charAt(0).compare("C") == 0 && cmd.length == 5)
             {
                 let arg1Int: number = strToNumber(cmd.substr(1,1));
-                let arg2Int: number = strToNumber(cmd.substr(2, 1));
+                let arg2Int: number = strToNumber(cmd.substr(2,1));
+                let arg3Int: number = strToNumber(cmd.substr(3,2));
                 if (arg1Int != -1 && arg2Int != -1)
                 {
                     if (arg1Int == 0)
@@ -183,6 +257,24 @@
                         obstacleSensor2 = false;
                     }    
                 }    
+                if (arg3Int != -1) {
+                    if (arg3Int == 0) {
+                        if (adress != 0) {
+                            control.raiseEvent(MESSAGE_HEAD_STOP, 0);
+                        }
+                        sendFlag = false;
+                        adress = 0;
+                    }
+                    else {
+                        if (adress != arg3Int) {
+                            if (!sendFlag) {
+                                control.raiseEvent(MESSAGE_HEAD, arg3Int);
+                                sendFlag = true;
+                            }
+                            adress = arg3Int
+                        }
+                    }
+                }
             }  
             if (cmd.charAt(0).compare("U") == 0 && cmd.length == 5)
             {
@@ -307,8 +399,8 @@
 /**
 *	Set the speed of the motor, range of -100~100, that can control the Qbit running.
 */
-//% weight=98 blockId=setQbitRunSpeed block="Set Qbit(V1.2 version or newer) run|speed %speed|and oriention %oriention"
-//% speed.min=-100 speed.max=100
+//% weight=98 blockId=setQbitRunSpeed block="Set Qbit(V2.0 version or newer) run|speed %speed|and oriention %oriention"
+//% speed.min=0 speed.max=100
 export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
     if (speed> 100 || speed < 0) {
         return;
@@ -336,10 +428,30 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
    serial.writeBuffer(buf);
 }    
 
+ /**
+  * Do someting when Qbit receive remote-control code
+  * @param code the ir key button that needs to be pressed
+  * @param body code to run when event is raised
+  */
+ //% weight=95 blockId=onQbit_remote_ir_pressed block="on remote-control|%code|pressed"
+ export function onQbit_remote_ir_pressed(code: IRKEY,body: Action) {
+     control.onEvent(MESSAGE_HEAD,code,body);
+  }
+  
+ /**
+  * Do someting when remote-control stop send
+  * @param code the ir key button that needs to be pressed
+  * @param body code to run when event is raised
+  */
+ //% weight=94 blockId=onQbit_remote_no_ir block="on remote-control stop send"
+ export function onQbit_remote_no_ir(body: Action) {
+     control.onEvent(MESSAGE_HEAD_STOP, 0, body);
+ }     
+     
 /**
 *  Obtain the distance of ultrasonic detection to the obstacle
 */
-//% weight=94 blockId=Ultrasonic block="Ultrasonic distance(cm)"
+//% weight=93 blockId=Ultrasonic block="Ultrasonic distance(cm)"
    export function Ultrasonic(): number {
 	   //init pins
    let echoPin:DigitalPin = DigitalPin.P13;
