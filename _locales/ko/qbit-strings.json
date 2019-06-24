@@ -2,7 +2,7 @@
 	"qbit.qbitInit|block": "큐빗 초기화하기",
 	"qbit.setMotorSpeed|block": "모터1 속도를|%speed1|로 설정하고 모터2|의 속도를 %speed2 로 설정하기",
 	"qbit.Ultrasonic|block": "초음파 센서 측정거리(cm)",
-	"qbit.setQbitRunSpeed|block":"设置Qbit(V2.0或以上版本) 运行|速度 %speed|方向 %oriention",
+	"qbit.setQbitRunSpeed|block":"Set Qbit(V2.0 version or newer) run|speed %speed|and oriention %oriention",
 	"qbit.getSoundVolume|block": "음량(0~255)",
 	"Lights.Light1|block":"불빛 1",
 	"Lights.Light2|block":"불빛 2",
@@ -80,6 +80,6 @@
 	"qbit.getBatVoltage|block":"Qbit 현재 전압(mV) 얻기",
 	"qbit.UltrasonicSend|block":"제어보드에 초음파 측정거리 보내기",
 	"qbit.setBLAngle|block":"Qbit 중심 균형 각도 설정하기",
-	"qbit.onQbit_remote_ir_pressed|block": "当红外遥控器|%code|按下时",
-	"qbit.onQbit_remote_no_ir|block": "当遥控器停止按下"
+	"qbit.onQbit_remote_ir_pressed|block": "on remote-control|%code|pressed",
+	"qbit.onQbit_remote_no_ir|block": "on remote-control stop send"
 }
