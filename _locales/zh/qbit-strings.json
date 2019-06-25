@@ -17,7 +17,7 @@
 	"qbit.setBrightness|block":"设置RGB灯亮度 %brightness",
 	"qbit.obstacleSensor|block":"避障传感器|%sensor|是否检测到障碍物",
 	"qbit.checkCurrentColor|block": "检测颜色是否是 %color",
-	"qbit.setQbitRun|block":"设置Qbit %runType",
+	"qbit.setQbitRun|block":"设置Qbit平衡 %runType",
 	"qbit.Colors.Red|block":"红色",
 	"qbit.Colors.Green|block":"绿色",
 	"qbit.Colors.Blue|block":"蓝色",

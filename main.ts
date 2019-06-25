@@ -373,28 +373,6 @@
             return -1; 
     }
  
-
-/**
-*	Set the speed of the number 1 motor and number 2 motor, range of -100~100, that can control the tank to go advance or turn of.
-*/
-//% weight=99 blockId=setMotorSpeed block="Set motor1 speed|%speed1|and motor2|speed %speed2"
-//% speed1.min=-100 speed1.max=100
-//% speed2.min=-100 speed2.max=100
-    export function setMotorSpeed(speed1: number, speed2: number) {
-        if (speed1 > 100 || speed1 < -100 || speed2 > 100 || speed2 < -100) {
-            return;
-        }
-        speed1 = speed1 * -1;
-        speed2 = speed2 * -1;
-   let buf = pins.createBuffer(6);
-   buf[0] = 0x55;
-   buf[1] = 0x55;
-   buf[2] = 0x04;
-   buf[3] = 0x32;//cmd type
-   buf[4] = speed1;
-   buf[5] = speed2;
-   serial.writeBuffer(buf);
-}
     
 /**
 *	Set the speed of the motor, range of -100~100, that can control the Qbit running.
@@ -492,7 +470,7 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
       /**
     * Stop Qbit run.
     */
-    //% weight=90 blockId=setQbitRun block="Set Qbit %runType"
+    //% weight=90 blockId=setQbitRun block="Set Qbit balance %runType"
     export function setQbitRun(runType: QbitRunType) {
         let buf = pins.createBuffer(5);
         buf[0] = 0x55;
@@ -502,16 +480,6 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
 	    buf[4] = runType;
         serial.writeBuffer(buf);
     }    
-
-/**
-* Get the volume level detected by the sound sensor, range 0 to 255
-*/
-//% weight=88 blockId=getSoundVolume block="Sound volume"
-	export function getSoundVolume(): number {	
-        let volume = pins.analogReadPin(AnalogPin.P1);
-        volume = mapRGB(volume, 0, 1023, 0, 255);
-  	    return volume;
-    }	
     
     /**
      * Detect whether avoid obstacle sensor detect obstacle
@@ -534,7 +502,7 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
 	 */
 	function initRGBLight() {
 		if (!lhRGBLight) {
-			lhRGBLight = QbitRGBLight.create(DigitalPin.P15, 4, QbitRGBPixelMode.RGB);
+			lhRGBLight = QbitRGBLight.create(DigitalPin.P15, 2, QbitRGBPixelMode.RGB);
         }
         clearLight();
     }
@@ -586,353 +554,10 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
     }
 
 
-	const APDS9960_I2C_ADDR = 0x39;
-    const APDS9960_ID_1 = 0xA8;
-    const APDS9960_ID_2 = 0x9C;
-    /* APDS-9960 register addresses */
-    const APDS9960_ENABLE = 0x80;
-    const APDS9960_ATIME  = 0x81;
-    const APDS9960_WTIME  = 0x83;
-    const APDS9960_AILTL  = 0x84;
-    const APDS9960_AILTH  = 0x85;
-    const APDS9960_AIHTL  = 0x86;
-    const APDS9960_AIHTH  = 0x87;
-    const APDS9960_PILT = 0x89;
-    const APDS9960_PIHT = 0x8B;
-    const APDS9960_PERS = 0x8C;
-    const APDS9960_CONFIG1 = 0x8D;
-    const APDS9960_PPULSE  = 0x8E;
-    const APDS9960_CONTROL = 0x8F;
-    const APDS9960_CONFIG2 = 0x90;
-    const APDS9960_ID = 0x92;
-    const APDS9960_STATUS  = 0x93;
-    const APDS9960_CDATAL  = 0x94;
-    const APDS9960_CDATAH  = 0x95;
-    const APDS9960_RDATAL  = 0x96;
-    const APDS9960_RDATAH  = 0x97;
-    const APDS9960_GDATAL  = 0x98;
-    const APDS9960_GDATAH  = 0x99;
-    const APDS9960_BDATAL  = 0x9A;
-    const APDS9960_BDATAH  = 0x9B;
-    const APDS9960_PDATA   = 0x9C;
-    const APDS9960_POFFSET_UR = 0x9D;
-    const APDS9960_POFFSET_DL = 0x9E;
-    const APDS9960_CONFIG3 = 0x9F;
-
-
-    /* LED Drive values */
-    const LED_DRIVE_100MA = 0;
-    const LED_DRIVE_50MA = 1;
-    const LED_DRIVE_25MA = 2;
-    const LED_DRIVE_12_5MA = 3;
-
-    /* ALS Gain (AGAIN) values */
-    const AGAIN_1X = 0;
-    const AGAIN_4X = 1;
-    const AGAIN_16X = 2;
-    const AGAIN_64X = 3;
-    
-    /* Default values */
-    const DEFAULT_ATIME = 219;    // 103ms
-    const DEFAULT_WTIME = 246;    // 27ms
-    const DEFAULT_PROX_PPULSE = 0x87;    // 16us, 8 pulses
-    const DEFAULT_GESTURE_PPULSE = 0x89;    // 16us, 10 pulses
-    const DEFAULT_POFFSET_UR = 0;       // 0 offset
-    const DEFAULT_POFFSET_DL = 0;       // 0 offset      
-    const DEFAULT_CONFIG1 = 0x60;    // No 12x wait (WTIME) factor
-    const DEFAULT_PILT = 0;       // Low proximity threshold
-    const DEFAULT_PIHT = 50;      // High proximity threshold
-    const DEFAULT_AILT = 0xFFFF;  // Force interrupt for calibration
-    const DEFAULT_AIHT = 0;
-    const DEFAULT_PERS = 0x11;    // 2 consecutive prox or ALS for int.
-    const DEFAULT_CONFIG2 = 0x01;    // No saturation interrupts or LED boost  
-    const DEFAULT_CONFIG3 = 0;       // Enable all photodiodes, no SAI
-    const DEFAULT_GPENTH = 40;      // Threshold for entering gesture mode
-    const DEFAULT_GEXTH = 30;      // Threshold for exiting gesture mode    
-    const DEFAULT_GCONF1 = 0x40;    // 4 gesture events for int., 1 for exit
-    const DEFAULT_GOFFSET = 0;       // No offset scaling for gesture mode
-    const DEFAULT_GPULSE = 0xC9;    // 32us, 10 pulses
-    const DEFAULT_GCONF3 = 0;       // All photodiodes active during gesture
-    const DEFAULT_GIEN = 0;       // Disable gesture interrupts
-    const DEFAULT_LDRIVE = LED_DRIVE_100MA;
-    const DEFAULT_AGAIN = AGAIN_4X;
-    
-    const OFF = 0;
-    const ON = 1;
-    const POWER = 0;
-    const AMBIENT_LIGHT = 1;
-    const PROXIMITY = 2;
-    const WAIT = 3;
-    const AMBIENT_LIGHT_INT = 4;
-    const PROXIMITY_INT = 5;
-    const GESTURE = 6;
-    const ALL = 7;
-
-
-    function i2cwrite(reg: number, value: number) {
-       let buf = pins.createBuffer(2);
-       buf[0] = reg;
-       buf[1] = value;
-       pins.i2cWriteBuffer(APDS9960_I2C_ADDR, buf);
-    }
-
-     function i2cread(reg: number): number {
-		pins.i2cWriteNumber(APDS9960_I2C_ADDR, reg, NumberFormat.UInt8BE);
-        let val = pins.i2cReadNumber(APDS9960_I2C_ADDR, NumberFormat.UInt8BE);
-        return val;
-    }
-
-     function InitColor(): boolean {
-         let id = i2cread(APDS9960_ID);
-        //  serial.writeLine("id:")
-        //  serial.writeNumber(id); 
-        if (!(id == APDS9960_ID_1 || id == APDS9960_ID_2)) {
-            return false;
-         }
-        //  serial.writeLine("set mode:")
-        setMode(ALL, OFF);
-        i2cwrite(APDS9960_ATIME, DEFAULT_ATIME);
-        i2cwrite(APDS9960_WTIME, DEFAULT_WTIME);
-        i2cwrite(APDS9960_PPULSE, DEFAULT_PROX_PPULSE);
-        i2cwrite(APDS9960_POFFSET_UR, DEFAULT_POFFSET_UR);
-        i2cwrite(APDS9960_POFFSET_DL, DEFAULT_POFFSET_DL);
-        i2cwrite(APDS9960_CONFIG1, DEFAULT_CONFIG1);
-        setLEDDrive(DEFAULT_LDRIVE);
-        setAmbientLightGain(DEFAULT_AGAIN);
-        setLightIntLowThreshold(DEFAULT_AILT);
-        setLightIntHighThreshold(DEFAULT_AIHT);
-        i2cwrite(APDS9960_PERS, DEFAULT_PERS);
-        i2cwrite(APDS9960_CONFIG2, DEFAULT_CONFIG2);
-        i2cwrite(APDS9960_CONFIG3, DEFAULT_CONFIG3);
-        return true;  
-    }
-        
-     function setMode(mode: number, enable: number) {
-         let reg_val = getMode();
-            /* Change bit(s) in ENABLE register */
-        enable = enable & 0x01;
-         if (mode >= 0 && mode <= 6)
-         {
-             if (enable > 0)
-             {
-                reg_val |= (1 << mode);
-             }
-             else
-             {
-                //reg_val &= ~(1 << mode);
-                 reg_val &= (0xff-(1 << mode)); 
-             }
-        }
-         else if(mode == ALL)
-         {
-             if (enable > 0)
-             {
-                reg_val = 0x7F;
-             }
-             else
-             {
-                reg_val = 0x00;
-             }
-        }
-        i2cwrite(APDS9960_ENABLE,reg_val);
-    }
-    
-     function getMode(): number {
-            let enable_value = i2cread(APDS9960_ENABLE);
-            return enable_value;
-        }
-
-     function setLEDDrive(drive: number) {
-        let val = i2cread(APDS9960_CONTROL);
-            /* Set bits in register to given value */
-         drive &= 0b00000011;
-         drive = drive << 6;
-         val &= 0b00111111;
-         val |= drive;
-         i2cwrite(APDS9960_CONTROL,val);
-    }
-    
-     function setLightIntLowThreshold(threshold: number) {
-        let val_low = threshold & 0x00FF;
-        let val_high = (threshold & 0xFF00) >> 8;
-        i2cwrite(APDS9960_AILTL, val_low);
-        i2cwrite(APDS9960_AILTH,val_high);
-    }
-
-     function setLightIntHighThreshold(threshold: number) {
-        let val_low = threshold & 0x00FF;
-        let val_high = (threshold & 0xFF00) >> 8;
-        i2cwrite(APDS9960_AIHTL, val_low);
-        i2cwrite(APDS9960_AIHTH, val_high);
-    }
-
-     function enableLightSensor(interrupts: boolean) {
-        setAmbientLightGain(DEFAULT_AGAIN);
-        if (interrupts)
-        {
-            setAmbientLightIntEnable(1);
-        }   
-        else
-        {
-            setAmbientLightIntEnable(0);
-        }
-        enablePower();
-        setMode(AMBIENT_LIGHT,1);
-    }
-
-     function setAmbientLightGain(drive: number) {
-        let val = i2cread(APDS9960_CONTROL);
-            /* Set bits in register to given value */
-        drive &= 0b00000011;
-        val &= 0b11111100;
-        val |= drive;
-        i2cwrite(APDS9960_CONTROL,val);
-    }
-
-     function getAmbientLightGain(): number {
-        let val = i2cread(APDS9960_CONTROL);
-        val &= 0b00000011;
-        return val;
-    }
-
-     function enablePower() {
-        setMode(POWER,1);
-    }
-
-     function setAmbientLightIntEnable(enable: number) {
-        let val = i2cread(APDS9960_ENABLE);
-            /* Set bits in register to given value */
-        enable &= 0b00000001;
-        enable = enable << 4;
-        val &= 0b11101111;
-        val |= enable;
-        i2cwrite(APDS9960_ENABLE, val);
-    }
-
-     function readAmbientLight(): number {
-        let val_byte = i2cread(APDS9960_CDATAL);
-        let val = val_byte;
-        val_byte = i2cread(APDS9960_CDATAH);
-        val = val + val_byte << 8;
-        return val;
-    }
-    
-     function readRedLight(): number {
-     
-        let val_byte = i2cread(APDS9960_RDATAL);
-        let val = val_byte;
-        val_byte = i2cread(APDS9960_RDATAH);
-        val = val + val_byte << 8;
-        return val;
-    }
-
-     function readGreenLight(): number {
-        
-           let val_byte = i2cread(APDS9960_GDATAL);
-           let val = val_byte;
-           val_byte = i2cread(APDS9960_GDATAH);
-           val = val + val_byte << 8;
-           return val;
-    }
-    
-     function readBlueLight(): number {
-        
-           let val_byte = i2cread(APDS9960_BDATAL);
-           let val = val_byte;
-           val_byte = i2cread(APDS9960_BDATAH);
-           val = val + val_byte << 8;
-           return val;
-       }
-
-	/**
-	 * Init Color Sensor
-	 */
-	export function initColorSensor() {
-        InitColor();
-		enableLightSensor(false);
-		control.waitMicros(100);
-	}
-
-	
-	/**
-	 *  Color sensor to obtain color value.
-	 */
-	//% weight=74 blockId=checkCurrentColor block="Current color %color"
-     export function checkCurrentColor(color: Colors): boolean {
-	setBrightness(150);     
-        setPixelRGB(Lights.Light1, QbitRGBColors.White);
-        setPixelRGB(Lights.Light2, QbitRGBColors.White);
-        showLight(); 
-		let r = readRedLight();
-		let g = readGreenLight();
-		let b = readBlueLight();
-        let t = Colors.Red;
-    
-		if (r > g)
-		{
-			t = Colors.Red;
-		}	
-		else
-		{
-			t = Colors.Green;
-		}	
-
-		if (t == Colors.Green && g < b)
-		{
-			if(b - g > 1000)
-			   t = Colors.Blue;
-		}	
-		if (t == Colors.Red && r < b)
-		{
-			t = Colors.Blue;
-         }
-//         serial.writeNumber(r); 
-//          serial.writeLine("->red");
-//          serial.writeNumber(g); 
-//          serial.writeLine("->green"); 
-//          serial.writeNumber(b); 
-//          serial.writeLine("->blue"); 
-	     
-	       if(r > 6800 && g > 8000 && b > 12000)
-	       {
-		       t = Colors.White;
-	       }
-	       else if(r < 800 && g < 1100 && b < 1300)
-		{
-		        t = Colors.Black;
-		 }
-		else if (t == Colors.Blue && b > 2800) {
-           // serial.writeLine("blue");
-            
-		}
-		else if (t == Colors.Green && g > 1500) {
-           // serial.writeLine("green");
-		}
-		else if (t == Colors.Red && r > 3000) {
-			//serial.writeLine("red");
-		}
-		else
-        {
-            //serial.writeLine("none");
-            return false;
-        }		
-        return (color == t);
-	}
-
 	function mapRGB(x: number, in_min: number, in_max: number, out_min: number, out_max: number): number {
 		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
      }
     
-    /**
-	 *  Color sensor light level, range from 0 ~ 255
-	 */
-	//% weight=72 blockGap=50 blockId=getSensorLightLevel block="Get color sensor light level"
-     export function getSensorLightLevel(): number {
-         let lightLevel: number = readAmbientLight();
-         serial.writeNumber(lightLevel); 
-         serial.writeLine("->light level");
-         return lightLevel;
-     }
 
     /**
 	 * Extension pin set
@@ -995,6 +620,7 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
      * Resolve the Bluetooth that phone APP send command type, the total of nine types of commands: tank display command, servo debug command, obtaining the distance of ultrasonic command, obtaining temperature command, obtain sound size rank orders, to obtain the light level command, set the color lights command, honking command, firmware version information command.
      */
     //% weight=62 blockId=analyzeBluetoothCmd block="Get bluetooth command type %str"
+    //% subcategory=Bluetooth 
     export function analyzeBluetoothCmd(str: string): number {
         if (str.length > 9)
         {
@@ -1046,6 +672,7 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
      */
     //% weight=60  blockId=getArgs block="Get bluetooth command|%str|argument at %index"
     //% index.min=1 index.max=3
+    //% subcategory=Bluetooth 
     export function getArgs(str: string, index: number): number {
         let cmdType = analyzeBluetoothCmd(str);
         if (cmdType == CmdType.NO_COMMAND)
@@ -1090,6 +717,7 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
      * Returns the enumeration of the command type, which can be compared with this module after obtaining the bluetooth command type sent by the mobile phone APP.
      */
     //% weight=58 blockId=getBluetoothCmdtype block="Bluetooth command type %type"
+    //% subcategory=Bluetooth 
     export function getBluetoothCmdtype(type: CmdType): number {
         return type;
     }
@@ -1098,6 +726,7 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
      * The command type of the tank is stop, go ahead, back, turn left, turn right, slow down, turn left slowly, turn right slowly.
      */
     //% weight=56 blockId=getRunCarType block="Car run type %type"
+    //% subcategory=Bluetooth      
     export function getRunCarType(type: CarRunCmdType): number {
         return type;
     }
@@ -1106,6 +735,7 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
      * The distance from the ultrasonic obstacle to the standard command, which is sent to the mobile phone. The APP will indicate the distance of the ultrasonic obstacle.
      */
     //% weight=54 blockId=convertUltrasonic block="Convert ultrasonic distance %data"
+    //% subcategory=Bluetooth  
     export function convertUltrasonic(data: number): string {
         let cmdStr: string = "CMD|03|";
         cmdStr += data.toString();
@@ -1117,6 +747,7 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
      * The conversion temperature value to standard command, sent to the mobile phone, and the APP displays the current temperature.
      */
     //% weight=52 blockId=convertTemperature block="Convert temperature %data"
+    //% subcategory=Bluetooth  
     export function convertTemperature(data: number): string {
         let cmdStr: string = "CMD|04|";
         cmdStr += data.toString();
@@ -1128,6 +759,7 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
      * Convert the light value to the standard command and send it to the mobile phone. The APP displays the current light level (0~255).
      */
     //% weight=50 blockId=convertLight block="Convert light %data"
+    //% subcategory=Bluetooth  
     export function convertLight(data: number): string {
         let cmdStr: string = "CMD|06|";
         cmdStr += data.toString();
@@ -1139,6 +771,7 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
      * Convert the battery value to the standard command and send it to the mobile phone. The APP displays the current voltage.
      */
     //% weight=48 blockId=convertBattery block="Convert battery %data"
+    //% subcategory=Bluetooth  
     export function convertBattery(data: number): string {
         let cmdStr: string = "CMD|07|";
         cmdStr += data.toString();

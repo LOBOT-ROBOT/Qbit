@@ -27,11 +27,7 @@ enum QbitRGBColors {
     //% block="Light 1"
     Light1 = 0x00,
     //% block="Light 2"
-    Light2 = 0x01,
-    //% block="Light 3"
-    Light3 = 0x02,
-    //% block="Light 4"
-    Light4 = 0x03
+    Light2 = 0x01
 }
 
 /**
