@@ -1,7 +1,7 @@
 {
     "name": "qbit",
     "version": "0.0.1",
-    "description": "Blocks for LewanSoul Qbit",
+    "description": "Blocks for LOBOT Qbit",
     "license": "MIT",
     "dependencies": {
         "core": "*"
