@@ -621,7 +621,7 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
     //% weight=62 blockId=analyzeBluetoothCmd block="Get bluetooth command type %str"
     //% subcategory=Bluetooth 
     export function analyzeBluetoothCmd(str: string): number {
-        if (str.length > 9)
+        if (str.length > 6)
         {
             let cmdHead = str.substr(0, 3);
             
