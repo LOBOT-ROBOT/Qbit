@@ -191,7 +191,6 @@
     //% weight=100 blockId=qbitInit block="Initialize Qbit"
     export function qbitInit() {
         initRGBLight();
-        initColorSensor();
         serial.redirect(
             SerialPin.P12,
             SerialPin.P8,
