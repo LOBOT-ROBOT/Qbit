@@ -425,14 +425,16 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
      control.onEvent(MESSAGE_HEAD_STOP, 0, body);
  }     
      
+ let distanceBak = 0;
 /**
 *  Obtain the distance of ultrasonic detection to the obstacle
 */
 //% weight=93 blockId=Ultrasonic block="Ultrasonic distance(cm)"
    export function Ultrasonic(): number {
 	   //init pins
-   let echoPin:DigitalPin = DigitalPin.P13;
-   let trigPin:DigitalPin = DigitalPin.P14;
+    let echoPin:DigitalPin = DigitalPin.P13;
+    let trigPin: DigitalPin = DigitalPin.P14;
+    let distance: number = 0;
    pins.setPull(echoPin, PinPullMode.PullNone);
    pins.setPull(trigPin, PinPullMode.PullNone);
 		   
@@ -445,8 +447,14 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
    control.waitMicros(5);
    // read pulse
    let d = pins.pulseIn(echoPin, PulseValue.High, 11600);
-    basic.pause(10);
-    return Math.round(d / 40);
+   distance = d;
+   // filter timeout spikes
+   if (distance == 0 || distance >= 13920) {
+       distance = distanceBak;
+   }
+   else
+       distanceBak = d;
+    return Math.round(distance * 10 / 6 / 58);
 }
     
       /**
