@@ -449,23 +449,6 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
     return Math.round(d / 40);
 }
     
-    
-/**
-*  Send ultrasonic distance to control board
-*/
-//% weight=92 blockId=UltrasonicSend block="Send ultrasonic distance to control board"
-    export function UltrasonicSend() {
-    let distance = Ultrasonic();
-    let buf = pins.createBuffer(6);
-    buf[0] = 0x55;
-    buf[1] = 0x55;
-    buf[2] = 0x04;
-    buf[3] = 0x33;//cmd type
-    buf[4] = distance & 0xff;
-    buf[5] = (distance >> 8) & 0xff;
-    serial.writeBuffer(buf);
- }
-   
       /**
     * Stop Qbit run.
     */
