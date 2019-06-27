@@ -14,7 +14,7 @@
 	"qbit.clearLight|block":"关闭彩灯",
 	"qbit.QbitRunType.STOP|block":"停止",
 	"qbit.QbitRunType.RUN|block":"运行",
-	"qbit.setBrightness|block":"设置RGB灯亮度 %brightness",
+	"qbit.setBrightness|block":"设置彩灯亮度 %brightness",
 	"qbit.obstacleSensor|block":"避障传感器|%sensor|是否检测到障碍物",
 	"qbit.checkCurrentColor|block": "检测颜色是否是 %color",
 	"qbit.setQbitRun|block":"设置Qbit平衡 %runType",

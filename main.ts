@@ -501,7 +501,7 @@ export function setQbitRunSpeed(speed: number, oriention: OrientionType) {
          * Set the brightness of the strip. This flag only applies to future operation.
          * @param brightness a measure of LED brightness in 0-255. eg: 255
     */
-    //% blockId="setBrightness" block="set brightness %brightness"
+    //% blockId="setBrightness" block="set light brightness %brightness"
     //% weight=84
     export function setBrightness(brightness: number): void {
         lhRGBLight.setBrightness(brightness);
