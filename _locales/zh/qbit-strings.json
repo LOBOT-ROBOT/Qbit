@@ -81,5 +81,6 @@
 	"qbit.UltrasonicSend|block":"发送超声波测试距离到控制板中",
 	"qbit.setBLAngle|block":"设置Qbit中心平衡角度",
 	"qbit.onQbit_remote_ir_pressed|block": "当红外遥控器|%code|按下时",
-	"qbit.onQbit_remote_no_ir|block": "当遥控器停止按下"
+	"qbit.onQbit_remote_no_ir|block": "当遥控器停止按下",
+	"qbit.qbit_carrier|block":"设置Qbit为载物模式"
 }

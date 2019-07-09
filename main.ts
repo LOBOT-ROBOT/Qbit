@@ -208,6 +208,20 @@
         }
     }
 
+    /**
+   * Set Qbit run carrier mode
+  */
+    //% weight=99 blockId=qbit_carrier block="Set Qbit carrier mode"
+    export function qbit_carrier() {
+        let buf = pins.createBuffer(6);
+        buf[0] = 0x55;
+        buf[1] = 0x55;
+        buf[2] = 0x04;
+        buf[3] = 0x3B;//cmd type
+        buf[4] = 0x0;
+        buf[5] = 0x0;       
+        serial.writeBuffer(buf);
+    }
 
     function sendVersionCmd() {
         let buf = pins.createBuffer(4);
