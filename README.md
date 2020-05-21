@@ -1,6 +1,6 @@
 # qbit
 
-Blocks for LOBOT Qbit
+Blocks for Hiwonder Qbit
 
 ## License
 
