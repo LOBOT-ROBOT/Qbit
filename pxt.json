@@ -1,7 +1,7 @@
 {
     "name": "qbit",
     "version": "0.0.1",
-    "description": "Blocks for LOBOT Qbit",
+    "description": "Blocks for Hiwonder Qbit",
     "license": "MIT",
     "dependencies": {
         "core": "*"
